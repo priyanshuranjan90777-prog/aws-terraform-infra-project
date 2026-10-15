@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   terraform-check:
-    name: Terraform Format and Validate
+    name: Terraform Format, Validate and Security Scan
     runs-on: ubuntu-latest
 
     strategy:
@@ -44,3 +44,10 @@ jobs:
 
       - name: Validate Terraform configuration
         run: terraform validate
+
+      - name: Scan Terraform for security issues
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: environments/${{ matrix.environment }}
+          framework: terraform
+          soft_fail: true
