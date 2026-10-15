@@ -1,0 +1,30 @@
+# Terraform working directory
+**/.terraform/*
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Terraform plan files
+*.tfplan
+**/tfplan
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Local variable files and secrets
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Temporary AWS configuration
+s3-encryption.json
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
