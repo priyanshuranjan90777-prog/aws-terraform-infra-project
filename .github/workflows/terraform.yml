@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   terraform-check:
-    name: Terraform Format, Validate and Security Scan
+    name: Terraform Checks - ${{ matrix.environment }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -51,3 +51,6 @@ jobs:
           directory: environments/${{ matrix.environment }}
           framework: terraform
           soft_fail: true
+
+      - name: Report planned deployment status
+        run: echo "Formatting, validation, and security scanning completed for ${{ matrix.environment }}. AWS-backed Terraform planning will be configured separately."
