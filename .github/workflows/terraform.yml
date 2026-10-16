@@ -20,26 +20,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug GitHub context
-        run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Repository owner: $GITHUB_REPOSITORY_OWNER"
-          echo "Ref: $GITHUB_REF"
-          echo "Event: $GITHUB_EVENT_NAME"
-
-      - name: Request GitHub OIDC token
-        uses: actions/github-script@v7
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          script: |
-            const token = await core.getIDToken("sts.amazonaws.com");
-            const payload = JSON.parse(
-              Buffer.from(token.split(".")[1], "base64url").toString()
-            );
+          role-to-assume: arn:aws:iam::391732005521:role/GitHubTerraformPlanRole
+          aws-region: us-east-1
+          role-session-name: GitHubTerraformOIDCTest
 
-            console.log("OIDC issuer:", payload.iss);
-            console.log("OIDC audience:", payload.aud);
-            console.log("OIDC subject:", payload.sub);
-            console.log("Repository:", payload.repository);
-            console.log("Repository owner:", payload.repository_owner);
-            console.log("Ref:", payload.ref);
-            console.log("Job workflow ref:", payload.job_workflow_ref);
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
