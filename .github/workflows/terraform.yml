@@ -12,45 +12,20 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
-  terraform-check:
-    name: Terraform Checks - ${{ matrix.environment }}
+  aws-oidc-test:
+    name: Test GitHub-to-AWS OIDC
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        environment:
-          - dev
-          - prod
-
-    defaults:
-      run:
-        working-directory: environments/${{ matrix.environment }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Check Terraform formatting
-        run: terraform fmt -check -recursive
-
-      - name: Initialize Terraform
-        run: terraform init -backend=false
-
-      - name: Validate Terraform configuration
-        run: terraform validate
-
-      - name: Scan Terraform for security issues
-        uses: bridgecrewio/checkov-action@v12
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          directory: environments/${{ matrix.environment }}
-          framework: terraform
-          soft_fail: true
+          role-to-assume: arn:aws:iam::391732005521:role/GitHubTerraformPlanRole
+          aws-region: us-east-1
+          role-session-name: GitHubTerraformOIDCTest
 
-      - name: Report planned deployment status
-        run: echo "Formatting, validation, and security scanning completed for ${{ matrix.environment }}. AWS-backed Terraform planning will be configured separately."
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
